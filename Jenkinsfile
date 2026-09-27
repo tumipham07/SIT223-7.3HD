@@ -50,5 +50,28 @@ pipeline {
                 echo 'SonarQube analysis completed.'
             }
         }
+        stage('Code Quality') {
+            steps {
+                echo 'Running SonarQube code quality analysis...'
+
+                script {
+                    // Use the SonarScanner installation configured in Jenkins
+                    def scannerHome = tool 'SonarScanner'
+
+                    // Send the analysis to our SonarQube server
+                    withSonarQubeEnv('SonarQube-SIT223') {
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
+                    }
+                }
+    
+                    // Wait for SonarQube to return the Quality Gate result
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
+
+                echo 'SonarQube Quality Gate passed successfully.'
+            }
+        }
     }
 }
