@@ -64,14 +64,13 @@ pipeline {
                     }
                 }
     
-                    // Wait for SonarQube to return the Quality Gate result
-                    timeout(time: 5, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
+                // Wait for SonarQube to return the Quality Gate result
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
-
-                echo 'SonarQube Quality Gate passed successfully.'
             }
+
+            echo 'SonarQube Quality Gate passed successfully.'
         }
     }
 }
