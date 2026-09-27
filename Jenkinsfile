@@ -20,15 +20,35 @@ pipeline {
             }
         }
         stage('Test') {
-    steps {
-        echo 'Running automated backend tests...'
+            steps {
+                echo 'Running automated backend tests...'
+                
+                // Run Jest and Supertest automated API tests
+                dir('backend') {
+                    bat 'npm test'
+                }
 
-        dir('backend') {
-            bat 'npm test'
+            echo 'All automated tests passed successfully.'
+            }
         }
+        stage('Code Quality') {
+            steps {
+                echo 'Running SonarQube code quality analysis...'
 
-        echo 'All automated tests passed successfully.'
-    }
-}
+                script {
+                    // Use the SonarScanner tool configured in Jenkins
+                    def scannerHome = tool 'SonarScanner'
+
+                    // Connect this analysis to our configured SonarQube server
+                    withSonarQubeEnv('SonarQube-SIT223') {
+
+                        // Windows Jenkins uses the .bat scanner executable
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
+                    }
+                }
+
+                echo 'SonarQube analysis completed.'
+            }
+        }
     }
 }
