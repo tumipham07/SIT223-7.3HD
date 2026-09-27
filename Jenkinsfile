@@ -19,5 +19,16 @@ pipeline {
                 echo 'Build stage completed successfully.'
             }
         }
+        stage('Test') {
+    steps {
+        echo 'Running automated backend tests...'
+
+        dir('backend') {
+            bat 'npm test'
+        }
+
+        echo 'All automated tests passed successfully.'
+    }
+}
     }
 }
