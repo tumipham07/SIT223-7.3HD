@@ -50,9 +50,8 @@ pipeline {
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
+                echo 'SonarQube Quality Gate passed successfully.'
             }
-
-            echo 'SonarQube Quality Gate passed successfully.'
         }
     }
 }
