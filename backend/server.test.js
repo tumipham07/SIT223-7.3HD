@@ -1,5 +1,11 @@
+
 const request = require("supertest")
 const jwt = require("jsonwebtoken")
+// Test-only JWT value used in automated tests
+process.env.JWT_SECRET = "test-jwt-secret"
+
+// Mock Firebase so tests do not require real Firebase credentials
+jest.mock("./firebaseAdmin", () => ({}))
 const app = require("./server")
 
 describe("Backend API", () => {
