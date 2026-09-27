@@ -1,0 +1,87 @@
+.post-page {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.post-header,
+.section-header {
+    background-color: #e0e0e0;
+    padding: 8px 12px;
+    font-weight: bold;
+}
+
+.post-type {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 15px 0 25px;
+}
+
+.post-type label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-row {
+    margin-bottom: 18px;
+}
+
+.form-row label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-row input,
+.form-row textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+}
+
+.post-description {
+    text-align: center;
+    margin: 12px 0 18px;
+}
+
+.post-description span {
+    color: red;
+}
+
+.post-button {
+    display: block;
+    margin-left: auto;
+    width: 130px;
+    padding: 10px;
+    border: none;
+    background-color: #bcbcbc;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.post-button:hover {
+    background-color: #e47a5b;
+    color: white;
+}
+
+.post-button:active {
+    background-color: #c95f42;
+    transform: scale(0.97);
+}
+
+.post-message {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.post-message.error {
+    color: red;
+}
+
+.post-message.success {
+    color: green;
+}

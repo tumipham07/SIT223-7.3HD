@@ -1,0 +1,48 @@
+services:
+
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    image: sit223-backend:staging
+    container_name: sit223-backend-staging
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      FIREBASE_SERVICE_ACCOUNT_PATH: /run/secrets/serviceAccountKey.json
+
+    volumes:
+      - ./backend/config/serviceAccountKey.json:/run/secrets/serviceAccountKey.json:ro
+
+    # Jenkins/Compose can verify that the deployed API is actually healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+
+  # React production frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+
+    image: sit223-frontend:staging
+    container_name: sit223-frontend-staging
+
+    ports:
+      - "8081:80"
+
+    # Start the frontend after the backend passes its health check
+    depends_on:
+      backend:
+        condition: service_healthy

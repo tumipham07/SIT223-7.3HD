@@ -1,0 +1,154 @@
+/* Main Browse Posts page */
+.browse-posts-page {
+    width: 85%;
+    max-width: 1100px;
+    margin: 40px auto;
+    min-height: 500px;
+}
+
+/* Page title */
+.browse-posts-page h1 {
+    margin-bottom: 10px;
+}
+
+/* Introductory text */
+.browse-posts-page>p {
+    margin-bottom: 20px;
+}
+
+
+
+
+/* Container for all filtering controls */
+.filter-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+
+    padding: 18px;
+    margin-bottom: 25px;
+
+    background-color: #f4e1de;
+    border-radius: 8px;
+}
+
+/* Each filter label */
+.filter-section label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    font-weight: 500;
+}
+
+/* Dropdowns and filter input fields */
+.filter-section select,
+.filter-section input {
+    padding: 7px 10px;
+
+    border: 1px solid #aaa;
+    border-radius: 4px;
+
+    background-color: white;
+}
+
+/* Reset button */
+.filter-section button {
+    padding: 8px 16px;
+
+    border: none;
+    border-radius: 4px;
+
+    background-color: #59585e;
+    color: white;
+
+    cursor: pointer;
+}
+
+/* Reset button hover */
+.filter-section button:hover {
+    opacity: 0.85;
+}
+
+
+
+
+/* Container holding all post cards */
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+
+
+/* Individual post card */
+.post-card {
+    padding: 20px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    background-color: white;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Post title */
+.post-card h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #59585e;
+}
+
+/* Post information */
+.post-card p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+/* Buttons inside each post */
+.post-card button {
+    padding: 7px 14px;
+    margin-top: 10px;
+    margin-right: 8px;
+
+    border: none;
+    border-radius: 4px;
+
+    background-color: #db7758;
+    color: white;
+
+    cursor: pointer;
+}
+
+/* Post button hover effect */
+.post-card button:hover {
+    opacity: 0.85;
+}
+
+
+
+
+/* Full content displayed after clicking Expand */
+.post-full-content {
+    margin-top: 15px;
+    padding: 15px;
+
+    background-color: #f8f8f8;
+
+    border-left: 4px solid #db7758;
+    border-radius: 4px;
+}
+
+
+/* Error message shown when posts cannot be loaded */
+.browse-message {
+    margin-top: 20px;
+
+    color: red;
+    font-weight: 500;
+}
