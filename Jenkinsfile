@@ -53,5 +53,21 @@ pipeline {
                 echo 'SonarQube Quality Gate passed successfully.'
             }
         }
+        stage('Security') {
+            steps {
+                echo 'Running dependency security scans...'
+
+                // Check frontend dependencies.
+                // Jenkins fails this stage if a moderate-or-higher vulnerability is found.
+                bat 'npm audit --audit-level=moderate'
+
+                // Check backend dependencies separately.
+                dir('backend') {
+                bat 'npm audit --audit-level=moderate'
+                }
+
+                echo 'Security scan passed: no moderate-or-higher vulnerabilities found.'
+            }
+        }
     }
 }
