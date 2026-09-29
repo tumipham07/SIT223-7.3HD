@@ -3,7 +3,20 @@ global:
 
   # Collect metrics from monitored services every 5 seconds
   scrape_interval: 5s
+  # Check alert conditions every 5 seconds
+  evaluation_interval: 5s
 
+# Load alert rules from this file
+rule_files:
+  - /etc/prometheus/alert_rules.yml
+# Send firing alerts from Prometheus to Alertmanager
+alerting:
+  alertmanagers:
+
+    # Alertmanager runs in the same Docker Compose network
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"
 
 # Define the applications Prometheus should monitor
 scrape_configs:

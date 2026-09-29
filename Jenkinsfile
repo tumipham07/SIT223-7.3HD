@@ -147,5 +147,36 @@ pipeline {
                 echo 'Versioned production release completed successfully.'
             }
         }
+        stage('Monitoring') {
+            steps {
+                echo 'Validating production monitoring and alerting...'
+
+                bat '''
+                    REM Ensure all monitoring containers are running.
+                    REM If they are already running, Docker simply leaves them running.
+                    "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" start sit223-prometheus
+                    "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" start sit223-grafana
+                    "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" start sit223-alertmanager
+
+                    REM Give the monitoring services a few seconds to become ready
+                    powershell -NoProfile -Command "Start-Sleep -Seconds 8"
+
+                    REM Verify that Prometheus is monitoring the production backend.
+                    REM Jenkins fails this stage if the backend target is not UP.
+                    powershell -NoProfile -Command "$r = Invoke-RestMethod 'http://localhost:9090/api/v1/targets'; $t = $r.data.activeTargets | Where-Object { $_.labels.job -eq 'sit223-backend' }; if (-not $t -or $t.health -ne 'up') { Write-Error 'Prometheus cannot monitor the production backend'; exit 1 }; Write-Host 'Prometheus confirms production backend is UP'"
+
+                    REM Verify that Prometheus is connected to Alertmanager.
+                    REM Jenkins fails if no active Alertmanager is registered.
+                    powershell -NoProfile -Command "$r = Invoke-RestMethod 'http://localhost:9090/api/v1/alertmanagers'; if ($r.data.activeAlertmanagers.Count -lt 1) { Write-Error 'Alertmanager is not connected to Prometheus'; exit 1 }; Write-Host 'Prometheus to Alertmanager connection verified'"
+
+                    REM Verify that Grafana itself is healthy.
+                    REM Grafana reports database=ok when its service is working correctly.
+                    powershell -NoProfile -Command "$r = Invoke-RestMethod 'http://localhost:3000/api/health'; if ($r.database -ne 'ok') { Write-Error 'Grafana health check failed'; exit 1 }; Write-Host 'Grafana is healthy'"
+                '''
+
+                // This message appears only when all monitoring checks pass
+                echo 'Production monitoring and alerting checks passed successfully.'
+            }
+        }
     }
 }

@@ -1,0 +1,26 @@
+# Prometheus alert rules for the SIT223 production application
+groups:
+
+  # Group related backend alerts together
+  - name: sit223-backend-alerts
+
+    rules:
+
+      # Trigger an alert when Prometheus cannot reach the production backend
+      - alert: SIT223BackendDown
+
+        # The Prometheus "up" metric becomes 0 when scraping fails
+        expr: up{job="sit223-backend"} == 0
+
+        # Wait 30 seconds before firing the alert
+        # This avoids reacting to very short connection interruptions
+        for: 30s
+
+        # Add useful information for Alertmanager
+        labels:
+          severity: critical
+
+        # Human-readable alert information
+        annotations:
+          summary: "SIT223 production backend is down"
+          description: "Prometheus has been unable to scrape the production backend for at least 30 seconds."

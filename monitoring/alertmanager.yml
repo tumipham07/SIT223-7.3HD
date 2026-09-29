@@ -1,0 +1,34 @@
+# Main Alertmanager configuration
+global:
+
+  # How long Alertmanager waits before considering
+  # a resolved alert active again
+  resolve_timeout: 5m
+
+
+# Define how incoming alerts should be grouped and routed
+route:
+
+  # Group alerts using their alert name
+  group_by:
+    - alertname
+
+  # Wait briefly before sending the first notification
+  group_wait: 5s
+
+  # Wait before sending updates for the same alert group
+  group_interval: 30s
+
+  # Repeat a notification if the problem remains unresolved
+  repeat_interval: 5m
+
+  # Send alerts to this receiver
+  receiver: "sit223-alerts"
+
+
+# Define where Alertmanager should send alerts
+receivers:
+
+  # For now this receiver allows us to verify
+  # that Prometheus successfully sends alerts to Alertmanager.
+  - name: "sit223-alerts"
