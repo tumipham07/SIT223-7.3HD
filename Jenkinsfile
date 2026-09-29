@@ -57,13 +57,15 @@ pipeline {
             steps {
                 echo 'Running dependency security scans...'
 
-                // Check frontend dependencies.
-                // Jenkins fails this stage if a moderate-or-higher vulnerability is found.
-                bat 'npm audit --audit-level=moderate'
+                // Retry in case the npm audit service has a temporary network failure
+                    retry(3) {
+                    bat 'npm audit --audit-level=moderate'
+                }
 
-                // Check backend dependencies separately.
                 dir('backend') {
-                bat 'npm audit --audit-level=moderate'
+                    retry(3) {
+                        bat 'npm audit --audit-level=moderate'
+                    }
                 }
 
                 echo 'Security scan passed: no moderate-or-higher vulnerabilities found.'
