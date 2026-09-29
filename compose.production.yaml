@@ -1,0 +1,56 @@
+services:
+
+  # Production backend service
+  backend:
+
+    # Use the already-built backend image.
+    # IMAGE_TAG will be supplied by Jenkins during the Release stage.
+    image: sit223-backend:${IMAGE_TAG}
+
+    # Separate production container name
+    container_name: sit223-backend-production
+
+    # Expose production backend on port 5001
+    # Container still listens internally on port 5000
+    ports:
+      - "5001:5000"
+
+    # Load backend environment variables securely
+    env_file:
+      - ./backend/.env
+
+    # Tell the backend where the Firebase credential file is mounted
+    environment:
+      FIREBASE_SERVICE_ACCOUNT_PATH: /run/secrets/serviceAccountKey.json
+
+    # Mount the Firebase service account as a read-only file
+    volumes:
+      - ./backend/config/serviceAccountKey.json:/run/secrets/serviceAccountKey.json:ro
+
+    # Check whether the backend is healthy before starting the frontend
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+
+  # Production frontend service
+  frontend:
+
+    # Use the already-built frontend image.
+    # Jenkins will provide the same IMAGE_TAG used for the backend.
+    image: sit223-frontend:${IMAGE_TAG}
+
+    # Separate production container name
+    container_name: sit223-frontend-production
+
+    # Production frontend will be available on localhost:8082
+    ports:
+      - "8082:80"
+
+    # Start the frontend only after the backend becomes healthy
+    depends_on:
+      backend:
+        condition: service_healthy

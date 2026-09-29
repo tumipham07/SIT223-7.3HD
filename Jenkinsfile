@@ -98,5 +98,54 @@ pipeline {
                 echo 'Staging deployment completed.'
             }
         }
+        stage('Release') {
+            steps {
+                echo 'Promoting the tested staging images to production...'
+
+                // Load the backend environment file and Firebase credential
+                // securely from Jenkins Credentials.
+                withCredentials([
+                    file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV_FILE'),
+                    file(credentialsId: 'firebase-service-account', variable: 'FIREBASE_SERVICE_FILE')
+                ]) {
+
+                    bat '''
+                        REM Create the backend config folder if it does not already exist
+                        if not exist backend\\config mkdir backend\\config
+
+                        REM Copy the secure Jenkins-managed environment file into the workspace
+                        copy /Y "%BACKEND_ENV_FILE%" "backend\\.env"
+
+                        REM Copy the Firebase service account into the workspace
+                        copy /Y "%FIREBASE_SERVICE_FILE%" "backend\\config\\serviceAccountKey.json"
+
+                        REM Create a unique version number using the Jenkins build number
+                        REM Example: build-16, build-17, build-18
+                        set IMAGE_TAG=build-%BUILD_NUMBER%
+
+                        REM Tag the tested staging backend image with the release version
+                        REM This promotes the same image instead of rebuilding a new one
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" tag sit223-backend:staging sit223-backend:%IMAGE_TAG%
+
+                        REM Tag the tested staging frontend image with the release version
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" tag sit223-frontend:staging sit223-frontend:%IMAGE_TAG%
+
+                        REM Stop and remove the previous production containers if they exist
+                        REM The -p option keeps production separate from the staging environment
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\cli-plugins\\docker-compose.exe" -p sit223-production -f compose.production.yaml down
+
+                        REM Start the production environment using the versioned images
+                        REM No Docker image rebuild happens here
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\cli-plugins\\docker-compose.exe" -p sit223-production -f compose.production.yaml up -d
+
+                        REM Display the production container status as release evidence
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\cli-plugins\\docker-compose.exe" -p sit223-production -f compose.production.yaml ps
+                    '''
+                }
+
+                // This message is shown only if all release commands succeed
+                echo 'Versioned production release completed successfully.'
+            }
+        }
     }
 }
