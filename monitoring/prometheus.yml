@@ -1,0 +1,23 @@
+# Global Prometheus configuration
+global:
+
+  # Collect metrics from monitored services every 5 seconds
+  scrape_interval: 5s
+
+
+# Define the applications Prometheus should monitor
+scrape_configs:
+
+  # Monitor the production SIT223 backend
+  - job_name: "sit223-backend"
+
+    # The backend exposes Prometheus data through /metrics
+    metrics_path: /metrics
+
+    static_configs:
+      - targets:
+
+          # Prometheus will run inside Docker.
+          # host.docker.internal allows the container to reach
+          # the Windows host where production port 5001 is exposed.
+          - "host.docker.internal:5001"
