@@ -85,10 +85,9 @@ pipeline {
                         copy /Y "%BACKEND_ENV_FILE%" "backend\\.env"
                         copy /Y "%FIREBASE_SERVICE_FILE%" "backend\\config\\serviceAccountKey.json"
 
-                        docker compose -f compose.staging.yaml down
-                        docker compose -f compose.staging.yaml up -d --build
-
-                        docker compose -f compose.staging.yaml ps
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" compose -f compose.staging.yaml down
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" compose -f compose.staging.yaml up -d --build
+                        "C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" compose -f compose.staging.yaml ps
                     '''
                 }
 
