@@ -69,5 +69,31 @@ pipeline {
                 echo 'Security scan passed: no moderate-or-higher vulnerabilities found.'
             }
         }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application to the staging environment...'
+
+                withCredentials([
+                    file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV_FILE'),
+                    file(credentialsId: 'firebase-service-account', variable: 'FIREBASE_SERVICE_FILE')
+                ]) {
+
+                    // Place the Jenkins-managed secrets where Docker Compose expects them
+                    bat '''
+                        if not exist backend\\config mkdir backend\\config
+
+                        copy /Y "%BACKEND_ENV_FILE%" "backend\\.env"
+                        copy /Y "%FIREBASE_SERVICE_FILE%" "backend\\config\\serviceAccountKey.json"
+
+                        docker compose -f compose.staging.yaml down
+                        docker compose -f compose.staging.yaml up -d --build
+
+                        docker compose -f compose.staging.yaml ps
+                    '''
+                }
+
+                echo 'Staging deployment completed.'
+            }
+        }
     }
 }
