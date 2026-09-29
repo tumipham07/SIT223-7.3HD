@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+
+backend/
+.git
+.scannerwork
+
+Jenkinsfile
+sonar-project.properties
+compose.staging.yaml
+
+*.log
