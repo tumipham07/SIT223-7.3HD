@@ -3,6 +3,8 @@ const cors = require("cors")
 const db = require("./firebaseAdmin")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+// Prometheus client used to expose backend monitoring metrics
+const client = require("@prometheus-io/client")
 require("dotenv").config()
 
 const JWT_SECRET = process.env.JWT_SECRET
@@ -21,6 +23,32 @@ const PORT = 5000
 // Allow the React frontend to communicate with the backend
 app.use(cors())
 
+// Collect default Node.js metrics such as memory usage,
+// CPU usage, event loop information and process statistics.
+client.collectDefaultMetrics()
+
+// Count HTTP requests handled by the backend.
+// Labels allow Prometheus to separate requests by method,
+// route and HTTP response status.
+const httpRequestCounter = new client.Counter({
+    name: "sit223_http_requests_total",
+    help: "Total number of HTTP requests received by the SIT223 backend",
+    labelNames: ["method", "route", "status"]
+})
+
+// Middleware that records every HTTP request after it finishes.
+app.use((req, res, next) => {
+    res.on("finish", () => {
+        httpRequestCounter.inc({
+            method: req.method,
+            route: req.route?.path || req.path,
+            status: res.statusCode.toString()
+        })
+    })
+
+    next()
+})
+
 // Allow the backend to read JSON request data
 app.use(express.json())
 
@@ -34,6 +62,22 @@ app.get("/health", (req, res) => {
         status: "healthy",
         service: "SIT223 DevOps Backend"
     })
+})
+// Prometheus metrics endpoint.
+// Prometheus will request this route to collect live backend metrics.
+app.get("/metrics", async (req, res) => {
+    try {
+        // Return the metrics using the Prometheus content type
+        res.set("Content-Type", client.register.contentType)
+
+        // Return all default and custom application metrics
+        res.end(await client.register.metrics())
+    } catch (error) {
+        console.error("Failed to generate Prometheus metrics:", error)
+
+        // Return an error if metrics cannot be generated
+        res.status(500).end()
+    }
 })
 
 // Register a new user account
